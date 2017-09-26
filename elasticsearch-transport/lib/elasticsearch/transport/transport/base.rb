@@ -127,7 +127,7 @@ module Elasticsearch
         #
         def __build_connections
           Connections::Collection.new \
-            :connections => (options[:connections_per_host] || DEFAULT_CONNECTIONS_PER_HOST).times.collect { hosts.map { |host|
+            :connections => (options[:connections_per_host] || DEFAULT_CONNECTIONS_PER_HOST).times.flat_map { hosts.map { |host|
               host[:protocol] = host[:scheme] || options[:scheme] || options[:http][:scheme] || DEFAULT_PROTOCOL
               host[:port] ||= options[:port] || options[:http][:scheme] || DEFAULT_PORT
               if (options[:user] || options[:http][:user]) && !host[:user]
@@ -136,7 +136,7 @@ module Elasticsearch
               end
 
               __build_connection(host, (options[:transport_options] || {}), @block)
-            }}.flatten!,
+            }},
             :selector_class => options[:selector_class],
             :selector => options[:selector]
         end
